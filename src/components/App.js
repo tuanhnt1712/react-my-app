@@ -6,6 +6,7 @@ import Order from './Order';
 import Inventory from './Inventory';
 import sampleFishes from '../sample-fishes';
 import Fish from './Fish';
+import base from '../base';
 
 class App extends Component {
   state = {
@@ -21,6 +22,23 @@ class App extends Component {
     this.setState({ fishes });
   };
 
+  componentDidMount() {
+    const { params } = this.props.match;
+    this.ref = base.syncState(`${params.storeId}/fishes`, {
+      context: this,
+      state: "fishes"
+    });
+  }
+
+  addToOrder = (key) => {
+    // take a copy state
+    const order = { ... this.state.order };
+    // add to the order, update umber
+    order[key] = order[key] + 1 || 1;
+    //call setState
+    this.setState({ order });
+  }
+
   loadSampleFishes = () => {
     this.setState({ fishes: sampleFishes })
   }
@@ -35,11 +53,12 @@ class App extends Component {
                 key={key}
                 index={key}
                 details={this.state.fishes[key]}
+                addToOrder={this.addToOrder}
               />
             ))}
           </ul>
         </div>
-        <Order />
+        <Order fishes={this.state.fishes} order={this.state.order}/>
         <Inventory addFish={this.addFish} loadSampleFishes={this.loadSampleFishes} />
       </div>
     );
