@@ -13,6 +13,18 @@ class App extends Component {
     fishes: {},
     order: {}
   };
+  componentDidMount() {
+    const { params } = this.props.match;
+    this.ref = base.syncState(`${params.storeId}/fishes`, {
+      context: this,
+      state: "fishes"
+    });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  }
+
   addFish = fish => {
     // 1. Take a copy of the existing state
     const fishes = { ...this.state.fishes };
@@ -22,26 +34,19 @@ class App extends Component {
     this.setState({ fishes });
   };
 
-  componentDidMount() {
-    const { params } = this.props.match;
-    this.ref = base.syncState(`${params.storeId}/fishes`, {
-      context: this,
-      state: "fishes"
-    });
-  }
-
-  addToOrder = (key) => {
-    // take a copy state
-    const order = { ... this.state.order };
-    // add to the order, update umber
-    order[key] = order[key] + 1 || 1;
-    //call setState
-    this.setState({ order });
-  }
-
   loadSampleFishes = () => {
-    this.setState({ fishes: sampleFishes })
-  }
+    this.setState({ fishes: sampleFishes });
+  };
+
+  addToOrder = key => {
+    // 1. take a copy of state
+    const order = { ...this.state.order };
+    // 2. Either add to the order, or update the number in our order
+    order[key] = order[key] + 1 || 1;
+    // 3. Call setState to update our state object
+    this.setState({ order });
+  };
+  
   render() {
     return (
       <div className="catch-of-the-day">
